@@ -140,3 +140,15 @@ input,select,textarea{border:1px solid #cfd8d3;border-radius:10px;padding:10px 1
 .challenge-bubble label{display:block;margin:10px 0 6px;font-weight:800}
 .challenge-bubble textarea{background:#fff}
 @media(max-width:820px){.octagon-layout,.think-story{grid-template-columns:1fr}}
+
+/* fresh7 final polish */
+.check-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:10px}
+@media(min-width:931px){
+  .reason-v2-figure{
+    position:sticky;
+    top:118px;
+    align-self:start;
+    max-height:calc(100vh - 135px);
+  }
+  .reason-v2-figure .reason-svg{max-height:calc(100vh - 245px)}
+}

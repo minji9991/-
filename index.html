@@ -102,7 +102,7 @@
           <div>외각의 합 = <span class="drop-zone" data-answer="360"></span>°</div>
         </div>
         <div id="deriveTokens" class="token-bank"></div>
-        <button type="button" class="primary" data-check="derive">완성 확인</button>
+        <div class="check-row"><button type="button" class="primary" data-check="derive">완성 확인</button><button type="button" id="retryDerive" class="secondary-btn">재도전</button></div>
         <p id="deriveMsg" class="feedback"></p>
       </div>
     </div>
@@ -131,7 +131,7 @@
     <p>따라서 정n각형의 한 외각의 크기는
       <span class="drop-zone" data-answer="360"></span>°÷<span class="drop-zone" data-answer="n"></span> 이다.</p>
     <div id="regularTokens" class="token-bank"></div>
-    <button type="button" class="primary" data-check="regular">완성 확인</button>
+    <div class="check-row"><button type="button" class="primary" data-check="regular">완성 확인</button><button type="button" id="retryRegular" class="secondary-btn">재도전</button></div>
     <p id="regularMsg" class="feedback"></p>
 
     <div class="octagon-apply">
@@ -237,7 +237,7 @@
         </div>
         <div class="speech-bubble challenge-bubble">
           <b>무슨 소리야.</b>
-          <label for="reflection">두곡이의 입장에서 세곡이에게 왜 900°가 아닌지 설명해 주세요.</label>
+          <label for="reflection">(두곡이의 입장에서 세곡이에게 왜 900°가 아닌지 설명해 주세요.)</label>
           <textarea id="reflection" rows="7" placeholder="세곡이의 방법에서 무엇을 잘못 세었는지 설명해 보세요."></textarea>
           <button id="submitReflection" type="button" class="primary">답안 제출</button>
           <p id="reflectionMsg" class="feedback"></p>

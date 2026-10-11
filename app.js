@@ -71,9 +71,26 @@ if(k==="reason-n"){
     answer("a4_polygon_n",{n:6,interiorSum:720});
   }
 }
-if(k==="derive"){const ok=$$("#deriveCard .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("deriveMsg",ok?"외각의 합은 360°입니다.":"빈칸을 다시 확인하세요.",ok);if(ok)answer("a4_derivation",{completed:true})}
+if(k==="derive"){
+  const z=$$("#deriveCard .drop-zone");
+  const v=z.map(x=>x.dataset.value||x.textContent.trim());
+  const firstPair=new Set([v[0],v[1]]);
+  const firstOk=firstPair.has("180(n-2)")&&firstPair.has("외각의합")&&v[2]==="180n";
+  const secondOk=v[3]==="180n"&&v[4]==="180(n-2)";
+  const thirdOk=v[5]==="360";
+  const ok=firstOk&&secondOk&&thirdOk;
+  fb("deriveMsg",ok?"정리했습니다. 내각의 합과 외각의 합의 순서를 바꾸어 놓아도 같은 식입니다.":"빈칸의 식을 다시 확인해 보세요. 첫 줄의 내각의 합과 외각의 합은 서로 순서를 바꾸어도 됩니다.",ok);
+  if(ok)answer("a4_derivation",{completed:true});
+})}
 if(k==="exterior-x"){const ok=norm($("#exteriorX").value)==="110";fb("exteriorXMsg",ok?"정답입니다. x=110°입니다.":"왼쪽 아래 외각은 90°입니다.",ok);if(ok)answer("a5_exterior_x",{value:110})}
-if(k==="regular"){const ok=$$("#regularBox .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("regularMsg",ok?"정확히 정리했습니다.":"조각을 다시 확인하세요.",ok);if(ok)answer("a6_regular",{completed:true})}
+if(k==="regular"){
+  const z=$$("#regularBox .drop-zone");
+  const v=z.map(x=>(x.dataset.value||x.textContent.trim()).replace(/\s+/g,""));
+  const expected=["같다","n-2","n","같다","360","n"];
+  const ok=v.length===expected.length&&v.every((x,i)=>x===expected[i]);
+  fb("regularMsg",ok?"정확히 정리했습니다.":"조각의 위치를 다시 확인해 보세요. 같은 글자 조각끼리는 어느 것을 사용해도 정답으로 인정됩니다.",ok);
+  if(ok)answer("a6_regular",{completed:true});
+})}
 if(k==="octagon"){
   const a=parseDegreeValue($("#octInterior").value),b=parseDegreeValue($("#octExterior").value);
   const ok=Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-135)<0.03&&Math.abs(b-45)<0.03;
@@ -102,7 +119,7 @@ function parseDegreeValue(v){
 function experiment(root){
   const n=+root.dataset.n,svg=$(".exterior-svg",root),ringWrap=$(".angle-ring",root),ring=$(".angle-ring svg",root);
   let p=points(n,210,150,n===4?92:102,-Math.PI/2-.12),extended=false,dragVertex=null,raf=0,pendingPoint=null;
-  const colors=[160,22,205,48,330,90];
+  const colors=["#4C78A8","#F58518","#B279A2","#72B7B2","#ECA82C","#9D755D"];
   const pieces=new Map(); // i -> {x,y,rot,centered}
   let assemblyActive=null; // {i,mode, pointerId, dx,dy}
 
@@ -150,7 +167,7 @@ function experiment(root){
     for(const [i,q] of pieces){
       const centered=Math.hypot(q.x-150,q.y-125)<=14;
       h+=`<g class="assembly-piece ${centered?"centered":""}" data-i="${i}" transform="translate(${q.x} ${q.y}) rotate(${q.rot})">
-          <path class="piece-sector" d="${pieceSectorPath(A[i])}" fill="hsl(${colors[i%colors.length]} 65% 76%)"></path>
+          <path class="piece-sector" d="${pieceSectorPath(A[i])}" fill="${colors[i%colors.length]}"></path>
           <circle class="pivot-dot" cx="0" cy="0" r="6"></circle>
           <line x1="70" y1="0" x2="82" y2="0" stroke="#b67a13" stroke-width="2"></line>
           <circle class="rotate-handle" cx="88" cy="0" r="8"></circle>
@@ -202,7 +219,7 @@ function experiment(root){
     e.preventDefault();e.stopPropagation();
     const ghost=document.createElement("div");ghost.className="angle-ghost";
     const A=getAngles(),a0=-Math.PI/2,a1=a0+rad(A[i]);
-    ghost.innerHTML=`<svg viewBox="0 0 90 90"><path d="${wedge(45,45,36,a0,a1)}" fill="hsl(${colors[i%colors.length]} 65% 75%)"></path></svg>`;
+    ghost.innerHTML=`<svg viewBox="0 0 90 90"><path d="${wedge(45,45,36,a0,a1)}" fill="${colors[i%colors.length]}"></path></svg>`;
     document.body.appendChild(ghost);
     const move=ev=>{ghost.style.left=ev.clientX+"px";ghost.style.top=ev.clientY+"px";ringWrap.classList.add("drag-target")};
     const up=ev=>{window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",up);ghost.remove();ringWrap.classList.remove("drag-target");placeFromSource(ev,i)};
@@ -213,7 +230,7 @@ function experiment(root){
     if(extended)for(let i=0;i<n;i++){
       const g=exteriorGeometry(i);
       h+=`<line x1="${g.cur.x}" y1="${g.cur.y}" x2="${g.ext.x}" y2="${g.ext.y}" class="extension"/>`;
-      h+=`<path class="ext-wedge" data-i="${i}" fill="hsl(${colors[i%colors.length]} 65% 78%)" d="${smallWedge(g.cur.x,g.cur.y,38,g.outA,g.extA)}"/>`;
+      h+=`<path class="ext-wedge" data-i="${i}" fill="${colors[i%colors.length]}" d="${smallWedge(g.cur.x,g.cur.y,38,g.outA,g.extA)}"/>`;
     }
     p.forEach((q,i)=>h+=`<circle class="drag-vertex" data-i="${i}" cx="${q.x}" cy="${q.y}" r="9"/><text x="${q.x+11}" y="${q.y-10}" font-weight="900">${String.fromCharCode(65+i)}</text>`);
     svg.innerHTML=h;
@@ -367,7 +384,65 @@ $("#reasonSvg").addEventListener("click",e=>{
 });
 renderReason();
 
-function dnd(bankSel,zonesSel,tokens){const bank=$(bankSel);tokens.forEach((t,i)=>{const b=document.createElement("button");b.className="drag-token";b.type="button";b.draggable=true;b.textContent=t[0];b.dataset.value=t[1];b.dataset.id=bankSel+i;b.ondragstart=e=>e.dataTransfer.setData("text/plain",b.dataset.id);b.onclick=()=>{$$(".drag-token.selected").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};bank.appendChild(b)});$$(zonesSel).forEach(z=>{z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();fill(z,$(`.drag-token[data-id="${e.dataTransfer.getData("text/plain")}"]`))};z.onclick=()=>fill(z,$(".drag-token.selected:not(.used)"))});function fill(z,t){if(!t)return;z.textContent=t.textContent;z.dataset.value=t.dataset.value;z.classList.add("filled");t.classList.add("used");t.classList.remove("selected")}}
+function dnd(bankSel,zonesSel,tokens){
+  const bank=$(bankSel); bank.innerHTML="";
+  const zones=$$(zonesSel);
+  tokens.forEach((t,i)=>{
+    const b=document.createElement("button");
+    b.className="drag-token"; b.type="button"; b.draggable=true;
+    b.textContent=t[0]; b.dataset.value=t[1]; b.dataset.id=`tok-${bankSel.replace(/[^a-z0-9]/gi,"")}-${i}`;
+    b.ondragstart=e=>e.dataTransfer.setData("text/plain",b.dataset.id);
+    b.onclick=()=>{
+      $$(".drag-token.selected").forEach(x=>x.classList.remove("selected"));
+      b.classList.add("selected");
+    };
+    bank.appendChild(b);
+  });
+  zones.forEach(z=>{
+    z.ondragover=e=>e.preventDefault();
+    z.ondrop=e=>{
+      e.preventDefault();
+      const id=e.dataTransfer.getData("text/plain");
+      fill(z,$(`.drag-token[data-id="${id}"]`));
+    };
+    z.onclick=()=>fill(z,$(".drag-token.selected"));
+  });
+  function fill(z,t){
+    if(!t)return;
+    // If this token was already in a different zone, free that zone.
+    zones.forEach(other=>{
+      if(other!==z && other.dataset.tokenId===t.dataset.id){
+        other.textContent="";
+        delete other.dataset.value;
+        delete other.dataset.tokenId;
+        other.classList.remove("filled");
+      }
+    });
+    // Free the token previously occupying this zone.
+    const oldId=z.dataset.tokenId;
+    if(oldId && oldId!==t.dataset.id){
+      const old=$(`.drag-token[data-id="${oldId}"]`);
+      if(old) old.classList.remove("used");
+    }
+    z.textContent=t.textContent;
+    z.dataset.value=t.dataset.value;
+    z.dataset.tokenId=t.dataset.id;
+    z.classList.add("filled");
+    t.classList.add("used");
+    t.classList.remove("selected");
+  }
+}
+function resetDnD(bankSel,zonesSel){
+  $$(zonesSel).forEach(z=>{
+    z.textContent="";
+    delete z.dataset.value;
+    delete z.dataset.tokenId;
+    z.classList.remove("filled");
+  });
+  $(`${bankSel}`)?.querySelectorAll(".drag-token").forEach(t=>{
+    t.classList.remove("used","selected");
+  });
+}
 dnd("#deriveTokens","#deriveCard .drop-zone",[["내각의 합","180(n-2)"],["외각의 합","외각의합"],["180n","180n"],["180(n-2)","180(n-2)"],["360","360"],["180n","180n"]]);dnd("#regularTokens","#regularBox .drop-zone",[["같다","같다"],["같다","같다"],["n-2","n-2"],["n","n"],["360","360"],["n","n"]]);
 dnd("#octHintTokens","#octHint .drop-zone",[["180","180"],["n-2","n-2"],["n","n"]]);
 
@@ -416,6 +491,16 @@ function renderOctagon(){
 }
 renderExteriorProblem();renderOctagon();
 
+
+
+$("#retryDerive").onclick=()=>{
+  resetDnD("#deriveTokens","#deriveCard .drop-zone");
+  fb("deriveMsg","다시 조각을 놓아 보세요.",true);
+};
+$("#retryRegular").onclick=()=>{
+  resetDnD("#regularTokens","#regularBox .drop-zone");
+  fb("regularMsg","다시 조각을 놓아 보세요.",true);
+};
 
 $("#hintToggle").onclick=()=>$("#octHint").classList.toggle("hidden-panel");
 $("#challengeToggle").onclick=()=>$("#octChallenge").classList.toggle("hidden-panel");
