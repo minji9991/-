@@ -3,6 +3,18 @@
 <main class="page">
 <section class="intro card"><h2>조작하고, 규칙을 찾아 식으로 정리해 봅시다.</h2><p>교사가 열어 준 활동만 진행할 수 있습니다.</p></section>
 
+<section class="concept-gate card" data-gate-for="1">
+  <div class="gate-lock">🔒 교사가 활동 1을 열면 확인할 수 있습니다.</div>
+  <div class="eyebrow">수업 시작</div>
+  <h2>지난 시간에는 무엇을 배웠나요?</h2>
+  <p class="gate-note">지난 시간에 배운 다각형과 대각선을 떠올려 봅시다.</p>
+  <div class="gate-question">
+    <label for="introInterior">이번 시간에는 다각형의 <b>00</b>의 크기의 합을 구해 봅시다.</label>
+    <div class="inline-answer"><input id="introInterior" placeholder="00에 들어갈 말" autocomplete="off"><button type="button" id="introInteriorBtn">확인</button></div>
+    <p id="introInteriorMsg" class="feedback"></p>
+  </div>
+</section>
+
 <section class="activity card" data-activity="1"><div class="activity-head"><span class="num">1</span><div><h2>한 꼭짓점에서 대각선을 그어 내각의 합을 찾아보자</h2><p>사각형, 오각형, 육각형에서 기준 꼭짓점을 직접 정하고 대각선을 모두 그어 보세요.</p></div></div><div class="lock-cover">🔒 교사가 활동 1을 열면 시작할 수 있습니다.</div>
 <div id="polygonExplore" class="polygon-grid"></div>
 <div class="question-box"><label>삼각형의 내각의 크기의 합은 몇 도인가요?</label><div class="inline-answer"><input id="triangleSum" inputmode="numeric"><span>°</span><button data-check="triangle-sum">확인</button></div><p id="triangleSumMsg" class="feedback"></p></div>
@@ -17,9 +29,18 @@
 <section class="activity card" data-activity="2"><div class="activity-head"><span class="num">2</span><div><h2>개념 적용하기 · 내각</h2><p>오각형의 내각의 크기의 합을 이용해 x를 구해 봅시다.</p></div></div><div class="lock-cover">🔒 교사가 활동 2를 열면 시작할 수 있습니다.</div>
 <div class="problem-layout"><svg viewBox="0 0 360 260" class="problem-svg"><polygon points="74,205 74,94 155,45 244,72 292,205" fill="#fbfcf9" stroke="#222" stroke-width="3"/><path d="M74 188 h17 v17" fill="none" stroke="#444" stroke-width="2"/><text x="87" y="91" class="angle-label">120°</text><text x="139" y="65" class="angle-label">110°</text><text x="229" y="98" class="angle-label">150°</text><text x="263" y="190" class="angle-label">x</text></svg><div><p>그림과 같은 오각형에서 <b>x</b>의 값을 구해 보세요.</p><div class="inline-answer"><input id="interiorX" inputmode="numeric"><span>°</span><button data-check="interior-x">확인</button></div><p id="interiorXMsg" class="feedback"></p></div></div></section>
 
-<section class="activity card" data-activity="3"><div class="activity-head"><span class="num">3</span><div><h2>다각형의 외각의 크기의 합을 찾아보자</h2><p>도형을 바꾸고 연장선을 만든 뒤 외각 조각을 한 점 둘레에 모아 보세요.</p></div></div><div class="lock-cover">🔒 교사가 활동 3을 열면 시작할 수 있습니다.</div>
-<div class="exterior-grid"><div class="experiment" data-n="4"><h3>사각형</h3><p>꼭짓점을 드래그해 모양을 바꿀 수 있습니다.</p><svg class="exterior-svg" viewBox="0 0 420 300"></svg><div class="row-actions"><button class="extend-btn">연장선 만들기</button><span class="mini-status">외각 0 / 4 선택</span></div><div class="angle-ring"><b>한 점 둘레에 모으기</b><svg viewBox="0 0 240 240"></svg></div></div>
-<div class="experiment" data-n="5"><h3>오각형</h3><p>꼭짓점을 드래그해 모양을 바꿀 수 있습니다.</p><svg class="exterior-svg" viewBox="0 0 420 300"></svg><div class="row-actions"><button class="extend-btn">연장선 만들기</button><span class="mini-status">외각 0 / 5 선택</span></div><div class="angle-ring"><b>한 점 둘레에 모으기</b><svg viewBox="0 0 240 240"></svg></div></div></div>
+<section class="concept-gate card" data-gate-for="3">
+  <div class="gate-lock">🔒 교사가 활동 3을 열면 확인할 수 있습니다.</div>
+  <div class="eyebrow">다음 탐구</div>
+  <h2>그렇다면 다각형의 00의 크기의 합은 어떻게 구할까요?</h2>
+  <p class="gate-note">내각의 크기의 합을 알아본 방법을 떠올리며 다음 탐구를 준비해 봅시다.</p>
+  <div class="inline-answer"><input id="introExterior" placeholder="00에 들어갈 말" autocomplete="off"><button type="button" id="introExteriorBtn">확인</button></div>
+  <p id="introExteriorMsg" class="feedback"></p>
+</section>
+
+<section class="activity card" data-activity="3"><div class="activity-head"><span class="num">3</span><div><h2>다각형의 외각의 크기의 합을 찾아보자</h2><p>도형을 바꾸고 연장선을 만들어 외각을 만든 뒤, 외각 조각을 직접 끌어 한 점 둘레에 모아 보세요.</p></div></div><div class="lock-cover">🔒 교사가 활동 3을 열면 시작할 수 있습니다.</div>
+<div class="exterior-grid"><div class="experiment" data-n="4"><h3>사각형</h3><p>꼭짓점을 드래그해 모양을 바꿀 수 있습니다.</p><svg class="exterior-svg" viewBox="0 0 420 300"></svg><div class="row-actions"><button class="extend-btn">연장선을 만들어 외각 만들기</button><span class="mini-status">외각 0 / 4 선택</span></div><div class="angle-ring"><b>한 점 둘레에 모으기</b><div class="drop-hint">외각 조각을 이곳으로 끌어오세요.</div><svg viewBox="0 0 240 240"></svg></div></div>
+<div class="experiment" data-n="5"><h3>오각형</h3><p>꼭짓점을 드래그해 모양을 바꿀 수 있습니다.</p><svg class="exterior-svg" viewBox="0 0 420 300"></svg><div class="row-actions"><button class="extend-btn">연장선을 만들어 외각 만들기</button><span class="mini-status">외각 0 / 5 선택</span></div><div class="angle-ring"><b>한 점 둘레에 모으기</b><div class="drop-hint">외각 조각을 이곳으로 끌어오세요.</div><svg viewBox="0 0 240 240"></svg></div></div></div>
 <div id="exteriorConclusion" class="conclusion-box disabled-box"><b>정리</b> 사각형과 오각형의 모양이 달라도 외각의 크기의 합은 <input id="exterior360" inputmode="numeric">°입니다. <button class="primary" data-check="exterior-360">확인</button><p id="exterior360Msg" class="feedback"></p></div></section>
 
 <section class="activity card" data-activity="4"><div class="activity-head"><span class="num">4</span><div><h2>왜 외각의 크기의 합은 360°일까?</h2><p>내각, 외각, 평각의 관계를 차례로 확인해 식을 완성해 봅시다.</p></div></div><div class="lock-cover">🔒 교사가 활동 4를 열면 시작할 수 있습니다.</div>
