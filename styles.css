@@ -14,3 +14,48 @@ input,select,textarea{border:1px solid #cfd8d3;border-radius:10px;padding:10px 1
 .activity.prereq-wait .lock-cover{display:flex}.activity.prereq-wait .lock-cover::after{content:" 먼저 위의 빈칸을 정확히 입력해 주세요."}.activity.prereq-wait .lock-cover{white-space:normal}
 /* exterior angle drag */
 .ext-wedge{touch-action:none;cursor:grab}.ext-wedge.dragging{opacity:.35}.angle-ring{transition:border-color .15s,background .15s}.angle-ring.drag-target{border-color:var(--g);background:#eef9f4}.drop-hint{font-size:12px;color:var(--m);margin-top:3px}.angle-ghost{position:fixed;z-index:9999;width:78px;height:78px;pointer-events:none;transform:translate(-39px,-39px);filter:drop-shadow(0 6px 12px rgba(0,0,0,.2))}.angle-ghost svg{width:78px;height:78px;overflow:visible}.angle-ghost path{stroke:#d86b53;stroke-width:2}.angle-ring .placed-count{font-size:12px;font-weight:800;fill:#667}.drag-vertex{touch-action:none;cursor:grab}.drag-vertex:active{cursor:grabbing}
+
+/* fresh4: manual angle-piece assembly */
+.angle-ring{position:relative}
+.angle-ring svg{height:260px;touch-action:none}
+.assembly-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.secondary-btn{border:1px solid #b9c8c0;background:#fff;color:#34443d;border-radius:10px;padding:8px 12px;font-weight:800}
+.assembly-piece{cursor:grab;touch-action:none;filter:drop-shadow(0 3px 5px rgba(0,0,0,.16))}
+.assembly-piece.active{filter:drop-shadow(0 0 5px rgba(47,134,104,.55))}
+.assembly-piece .piece-sector{stroke:#d86b53;stroke-width:2}
+.assembly-piece .pivot-dot{fill:#fff;stroke:#2f8668;stroke-width:2}
+.assembly-piece .rotate-handle{fill:#fff7dc;stroke:#b67a13;stroke-width:2;cursor:crosshair}
+.assembly-piece.centered .pivot-dot{fill:#dff5ea}
+.assembly-guide{fill:none;stroke:#cfdad4;stroke-width:2;stroke-dasharray:6 5}
+.assembly-axis{stroke:#d7dfdb;stroke-width:1.5;stroke-dasharray:4 5}
+.assembly-center{fill:#fff;stroke:#2f8668;stroke-width:3}
+.assembly-msg{margin-top:6px}
+
+/* smoother polygon dragging */
+.exterior-svg{touch-action:none}
+.experiment.dragging-polygon .exterior-svg{cursor:grabbing}
+.drag-vertex{will-change:transform}
+.exterior-svg .drag-vertex{vector-effect:non-scaling-stroke}
+
+/* activity 4 click robustness */
+.reason-int,.reason-ext{pointer-events:all;cursor:pointer}
+.reason-hit{fill:transparent;stroke:transparent;stroke-width:22;pointer-events:stroke;cursor:pointer}
+.reason-instruction{background:#f5f8f6;border-radius:10px;padding:10px 12px;color:#53635b}
+
+/* precise exterior application diagram */
+.exterior-problem-edge{fill:none;stroke:#222;stroke-width:3}
+.exterior-problem-extension{stroke:#7e8985;stroke-width:2;stroke-dasharray:6 5}
+.exterior-problem-arc{fill:none;stroke:#db755e;stroke-width:3}
+.exterior-problem-label{font-size:17px;font-weight:900;fill:#222}
+.exterior-problem-vertex{fill:#fff;stroke:#2f8668;stroke-width:2.5}
+
+/* heptagon application */
+.heptagon-apply{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.heptagon-apply h3{margin:0 0 12px}
+.heptagon-layout{display:grid;grid-template-columns:320px 1fr;gap:22px;align-items:center}
+#heptagonSvg{width:100%;background:#fff;border:1px solid var(--line);border-radius:14px}
+.heptagon-poly{fill:#f9fcfa;stroke:#222;stroke-width:3}
+.heptagon-angle{fill:#bfe2d5;stroke:#2f8668;stroke-width:2}
+.heptagon-ext{fill:#f5c4b7;stroke:#d86b53;stroke-width:2}
+.heptagon-questions{display:flex;flex-direction:column;gap:8px}.heptagon-questions label{font-weight:800}
+@media(max-width:760px){.heptagon-layout{grid-template-columns:1fr}}
