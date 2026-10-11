@@ -57,7 +57,20 @@ if(k==="n-triangles"){const ok=norm($("#nTriangleCount").value)==="n-2";fb("nTri
 if(k==="n-interior"){const v=norm($("#nInteriorSum").value).replaceAll("*",""),ok=v==="180(n-2)";fb("nInteriorMsg",ok?"n각형의 내각의 합은 180°×(n-2)입니다.":"180°와 n-2를 이용해 보세요.",ok);if(ok)answer("a1_n_interior",{value:"180(n-2)"})}
 if(k==="interior-x"){const ok=norm($("#interiorX").value)==="70";fb("interiorXMsg",ok?"정답입니다. x=70°입니다.":"오각형의 내각의 합은 540°입니다.",ok);if(ok)answer("a2_interior_x",{value:70})}
 if(k==="exterior-360"){const ok=norm($("#exterior360").value)==="360";fb("exterior360Msg",ok?"맞아요. 외각의 합은 360°입니다.":"모아진 외각 조각을 살펴보세요.",ok);if(ok)answer("a3_exterior_sum",{value:360})}
-if(k==="reason-interior"){const ok=norm($("#reasonInterior").value).replaceAll("*","")==="180(n-2)";fb("reasonInteriorMsg",ok?"내각의 합을 정확히 나타냈습니다. 이제 주황색 외각을 모두 클릭하세요.":"활동 1의 식을 떠올려 보세요.",ok);if(ok){reasonInteriorConfirmed=true;$("#reasonClickMsg").textContent="이제 주황색 외각 조각을 모두 클릭하세요.";$("#reasonClickMsg").className="feedback ok";}}
+if(k==="reason-n"){
+  const ok=norm($("#reasonN").value)==="6";
+  fb("reasonInteriorMsg",ok?"맞아요. 180°×(6−2)=720°입니다. 이제 회색 외각을 하나씩 눌러 보세요.":"이 그림은 꼭짓점이 몇 개인 육각형인지 세어 보세요.",ok);
+  if(ok){
+    reasonInteriorConfirmed=true;reasonExteriorEnabled=true;
+    $("#reasonFormulaResult").textContent="180° × (6 − 2) = 720°";
+    $("#reasonFormulaResult").classList.remove("muted");
+    $("#exteriorStageCard").classList.remove("disabled-box");
+    $("#reasonClickMsg").textContent="이제 회색 외각을 하나씩 눌러 보세요.";
+    $("#reasonClickMsg").className="feedback ok";
+    renderReason();
+    answer("a4_polygon_n",{n:6,interiorSum:720});
+  }
+}
 if(k==="derive"){const ok=$$("#deriveCard .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("deriveMsg",ok?"외각의 합은 360°입니다.":"빈칸을 다시 확인하세요.",ok);if(ok)answer("a4_derivation",{completed:true})}
 if(k==="exterior-x"){const ok=norm($("#exteriorX").value)==="110";fb("exteriorXMsg",ok?"정답입니다. x=110°입니다.":"왼쪽 아래 외각은 90°입니다.",ok);if(ok)answer("a5_exterior_x",{value:110})}
 if(k==="regular"){const ok=$$("#regularBox .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("regularMsg",ok?"정확히 정리했습니다.":"조각을 다시 확인하세요.",ok);if(ok)answer("a6_regular",{completed:true})}
@@ -96,11 +109,6 @@ function experiment(root){
     return {prev,cur,next,ext,extA,outA};
   }
   function getAngles(){return extAngles(p)}
-  function targetRotations(){
-    const A=getAngles();const targets=[];let t=-90;
-    for(let i=0;i<n;i++){targets.push(t);t+=A[i]}
-    return targets;
-  }
   function pieceSectorPath(degVal){
     return wedge(0,0,64,0,rad(degVal));
   }
@@ -111,18 +119,25 @@ function experiment(root){
     const obj={x:Math.max(40,Math.min(260,x)),y:Math.max(40,Math.min(220,y)),rot:-35+i*24,centered:false};
     pieces.set(i,obj);return obj;
   }
+  function normDeg(v){v%=360;if(v<0)v+=360;return v}
   function assemblyStatus(){
-    const A=getAngles(),targets=targetRotations(),cx=150,cy=125;
-    let centered=0,oriented=0;
-    for(let i=0;i<n;i++){
-      const q=pieces.get(i); if(!q) continue;
-      if(Math.hypot(q.x-cx,q.y-cy)<=14) centered++;
-      if(Math.hypot(q.x-cx,q.y-cy)<=14 && angleDiffDeg(q.rot,targets[i])<=9) oriented++;
+    const A=getAngles(),cx=150,cy=125,tolerance=14;
+    let centered=0,boundaries=0;
+    const starts=[];
+    for(const [i,q] of pieces){
+      const isCentered=Math.hypot(q.x-cx,q.y-cy)<=14;
+      if(isCentered){centered++;starts.push({i,a:normDeg(q.rot)})}
     }
-    return {centered,oriented,complete:centered===n&&oriented===n};
+    for(const [i,q] of pieces){
+      if(Math.hypot(q.x-cx,q.y-cy)>14) continue;
+      const endA=normDeg(q.rot+A[i]);
+      const best=starts.filter(s=>s.i!==i).reduce((m,s)=>Math.min(m,angleDiffDeg(endA,s.a)),999);
+      if(best<=tolerance) boundaries++;
+    }
+    return {centered,oriented:boundaries,complete:centered===n&&boundaries===n};
   }
   function renderRing(){
-    const A=getAngles(),targets=targetRotations();
+    const A=getAngles();
     let h=`<circle cx="150" cy="125" r="88" class="assembly-guide"></circle>
            <line x1="150" y1="30" x2="150" y2="220" class="assembly-axis"></line>
            <line x1="55" y1="125" x2="245" y2="125" class="assembly-axis"></line>
@@ -138,7 +153,7 @@ function experiment(root){
         </g>`;
     }
     const st=assemblyStatus();
-    h+=`<text x="150" y="252" text-anchor="middle" font-size="12" font-weight="800" fill="#667">중심 맞춤 ${st.centered}/${n} · 방향 맞춤 ${st.oriented}/${n}</text>`;
+    h+=`<text x="150" y="252" text-anchor="middle" font-size="12" font-weight="800" fill="#667">중심 맞춤 ${st.centered}/${n} · 경계 맞춤 ${st.oriented}/${n}</text>`;
     ring.innerHTML=h;
 
     $$(".assembly-piece",ring).forEach(g=>{
@@ -218,7 +233,7 @@ function experiment(root){
     const st=assemblyStatus(),m=$(".assembly-msg",root);
     if(pieces.size<n){m.textContent=`아직 ${n-pieces.size}개의 외각 조각을 더 가져와야 합니다.`;m.className="assembly-msg feedback bad";return}
     if(st.centered<n){m.textContent="각 조각의 꼭짓점(작은 원)을 가운데 초록 점에 맞춰 보세요.";m.className="assembly-msg feedback bad";return}
-    if(st.oriented<n){m.textContent="중심은 맞았습니다. 노란 회전 손잡이를 움직여 조각들의 경계선이 이어지도록 회전해 보세요.";m.className="assembly-msg feedback bad";return}
+    if(st.oriented<n){m.textContent="중심은 맞았습니다. 지금처럼 조각들의 경계선이 거의 이어지도록 회전하면 됩니다. 조금만 더 맞춰 보세요.";m.className="assembly-msg feedback bad";return}
     m.textContent="완성! 외각 조각들이 빈틈없이 한 바퀴를 이루므로 합은 360°입니다.";m.className="assembly-msg feedback ok";
     state.experimentsDone.add(n);
     if(state.experimentsDone.has(4)&&state.experimentsDone.has(5))$("#exteriorConclusion").classList.remove("disabled-box");
@@ -226,44 +241,127 @@ function experiment(root){
   };
   render();renderRing();
 }$$('.experiment').forEach(experiment);
-const rn=6,rp=points(6,260,210,145,-Math.PI/2);let ri=new Set(),re=new Set(),sd=new Set(),reasonInteriorConfirmed=false;
+// ---------- Activity 4: irregular hexagon, cumulative sums ----------
+const rn=6;
+const reasonInteriorAngles=[120,120,100,140,110,130];
+const reasonExteriorAngles=reasonInteriorAngles.map(v=>180-v); // 60,60,80,40,70,50
+let ri=new Set(),re=new Set(),sd=new Set(),reasonInteriorConfirmed=false,reasonExteriorEnabled=false,reasonStraightEnabled=false;
+
+// Construct a convex hexagon whose interior angles are exactly the values above.
+// Exterior turns: 60,60,80,40,70,50; positive side lengths chosen to close the polygon.
+const reasonDirs=[0,60,120,200,240,310].map(rad);
+const reasonLens=[0.92571387,1.03952683,1.11381296,1.03952683,0.96047317,0.88443129];
+const reasonRaw=[{x:0,y:0}];
+for(let i=0;i<6;i++) reasonRaw.push({
+  x:reasonRaw[i].x+reasonLens[i]*Math.cos(reasonDirs[i]),
+  y:reasonRaw[i].y+reasonLens[i]*Math.sin(reasonDirs[i])
+});
+const rawPts=reasonRaw.slice(0,6);
+const rxs=rawPts.map(p=>p.x),rys=rawPts.map(p=>p.y);
+const rminX=Math.min(...rxs),rmaxX=Math.max(...rxs),rminY=Math.min(...rys),rmaxY=Math.max(...rys);
+const rscale=Math.min(340/(rmaxX-rminX),300/(rmaxY-rminY));
+const rp=rawPts.map(p=>({x:105+(p.x-rminX)*rscale,y:75+(rmaxY-p.y)*rscale}));
+
+function reasonGeom(i){
+  const prev=rp[(i-1+rn)%rn],cur=rp[i],next=rp[(i+1)%rn];
+  const aPrev=Math.atan2(prev.y-cur.y,prev.x-cur.x);
+  const aNext=Math.atan2(next.y-cur.y,next.x-cur.x);
+  const dx=cur.x-prev.x,dy=cur.y-prev.y,l=Math.hypot(dx,dy)||1;
+  const ext={x:cur.x+dx/l*72,y:cur.y+dy/l*72};
+  const aExt=Math.atan2(ext.y-cur.y,ext.x-cur.x);
+  return {prev,cur,next,aPrev,aNext,ext,aExt};
+}
+function labelPoint(cur,a1,a2,r){
+  let d=a2-a1;while(d<0)d+=Math.PI*2;if(d>Math.PI){const t=a1;a1=a2;a2=t;d=Math.PI*2-d}
+  const mid=a1+d/2;
+  return {x:cur.x+r*Math.cos(mid),y:cur.y+r*Math.sin(mid)};
+}
+function updateReasonTracker(){
+  const interiorSelected=[...ri].sort((a,b)=>a-b).map(i=>reasonInteriorAngles[i]);
+  const exteriorSelected=[...re].sort((a,b)=>a-b).map(i=>reasonExteriorAngles[i]);
+  const total=interiorSelected.reduce((a,b)=>a+b,0)+exteriorSelected.reduce((a,b)=>a+b,0);
+  const parts=[...interiorSelected,...exteriorSelected];
+  $("#coloredAngleSum").textContent=parts.length?`${parts.join("° + ")}° = ${total}°`:"아직 선택한 각이 없습니다.";
+  $("#exteriorProgress").textContent=`외각 ${re.size} / ${rn}`;
+  $("#straightProgress").textContent=`확인한 평각: ${sd.size} / ${rn}`;
+}
 function renderReason(){
-  let h=`<polygon class="reason-poly" points="${rp.map(p=>p.x+","+p.y).join(" ")}"/>`;
+  let h=`<polygon class="reason-poly-v2" points="${rp.map(p=>p.x+","+p.y).join(" ")}"/>`;
   rp.forEach((cur,i)=>{
-    const prev=rp[(i-1+rn)%rn],next=rp[(i+1)%rn];
-    const aPrev=Math.atan2(prev.y-cur.y,prev.x-cur.x),aNext=Math.atan2(next.y-cur.y,next.x-cur.x);
-    const dx=cur.x-prev.x,dy=cur.y-prev.y,l=Math.hypot(dx,dy)||1,ext={x:cur.x+dx/l*72,y:cur.y+dy/l*72},aExt=Math.atan2(ext.y-cur.y,ext.x-cur.x);
-    h+=`<path data-kind="int" data-i="${i}" class="reason-int ${ri.has(i)?"chosen":""}" d="${smallWedge(cur.x,cur.y,38,aPrev,aNext)}"/>`;
-    h+=`<line x1="${cur.x}" y1="${cur.y}" x2="${ext.x}" y2="${ext.y}" class="extension"/>`;
-    h+=`<path data-kind="ext" data-i="${i}" class="reason-ext ${re.has(i)?"chosen":""}" d="${smallWedge(cur.x,cur.y,38,aNext,aExt)}"/>`;
-    h+=`<circle data-kind="int" data-i="${i}" class="reason-hit" cx="${cur.x}" cy="${cur.y}" r="28"></circle>`;
-    h+=`<text x="${cur.x+14}" y="${cur.y-14}" font-weight="900">${String.fromCharCode(65+i)}</text>`;
+    const g=reasonGeom(i);
+    const intClass=ri.has(i)?"reason-angle-interior-active":"reason-angle-inactive";
+    const extClass=re.has(i)?"reason-angle-exterior-active":(reasonExteriorEnabled?"reason-angle-inactive":"reason-angle-disabled");
+    h+=`<path data-kind="int" data-i="${i}" class="${intClass}" d="${smallWedge(cur.x,cur.y,44,g.aPrev,g.aNext)}"/>`;
+    h+=`<line x1="${cur.x}" y1="${cur.y}" x2="${g.ext.x}" y2="${g.ext.y}" class="reason-extension-v2"/>`;
+    h+=`<path data-kind="ext" data-i="${i}" class="${extClass}" d="${smallWedge(cur.x,cur.y,44,g.aNext,g.aExt)}"/>`;
+
+    const ip=labelPoint(cur,g.aPrev,g.aNext,29);
+    const ep=labelPoint(cur,g.aNext,g.aExt,31);
+    h+=`<text class="reason-angle-label ${ri.has(i)?"active":""}" x="${ip.x}" y="${ip.y+5}" text-anchor="middle">${reasonInteriorAngles[i]}°</text>`;
+    h+=`<text class="reason-angle-label ${re.has(i)?"active":""}" x="${ep.x}" y="${ep.y+5}" text-anchor="middle">${reasonExteriorAngles[i]}°</text>`;
+
+    const straightClass=sd.has(i)?"done":(reasonStraightEnabled?"ready":"");
+    if(reasonStraightEnabled||sd.has(i)){
+      h+=`<line class="reason-straight-visible ${straightClass}" x1="${g.prev.x}" y1="${g.prev.y}" x2="${g.ext.x}" y2="${g.ext.y}"/>`;
+      h+=`<line data-kind="straight" data-i="${i}" class="reason-straight-hit" x1="${g.prev.x}" y1="${g.prev.y}" x2="${g.ext.x}" y2="${g.ext.y}"/>`;
+    }
+    h+=`<circle cx="${cur.x}" cy="${cur.y}" r="5" fill="#fff" stroke="#363b41" stroke-width="2"/>`;
+    h+=`<text class="reason-vertex-label" x="${cur.x+13}" y="${cur.y-12}">${String.fromCharCode(65+i)}</text>`;
   });
   $("#reasonSvg").innerHTML=h;
+  updateReasonTracker();
 }
 $("#reasonSvg").addEventListener("click",e=>{
   const t=e.target.closest("[data-kind]");if(!t)return;
   const i=+t.dataset.i,kind=t.dataset.kind;
+
   if(kind==="int"){
-    ri.add(i);renderReason();
-    $("#reasonClickMsg").textContent=`내각 ${ri.size}/${rn}개 선택`;
+    if(ri.has(i))return;
+    ri.add(i);
+    $("#reasonClickMsg").textContent=`내각 ${ri.size}/${rn}개 선택 · 현재 내각의 합 ${[...ri].reduce((s,j)=>s+reasonInteriorAngles[j],0)}°`;
     $("#reasonClickMsg").className="feedback "+(ri.size===rn?"ok":"");
     if(ri.size===rn){
       $("#interiorFormulaCard").classList.remove("disabled-box");
-      $("#reasonClickMsg").textContent="모든 내각을 선택했습니다. 오른쪽에 내각의 합을 입력하세요.";
+      $("#reasonClickMsg").textContent="내각의 합이 720°가 되었습니다. 오른쪽 식의 □에 꼭짓점의 개수 6을 넣어 확인하세요.";
     }
-  }else if(kind==="ext"){
-    if(!reasonInteriorConfirmed){
-      $("#reasonClickMsg").textContent="먼저 모든 내각을 선택하고 내각의 합 180(n-2)를 정확히 입력해 주세요.";
+    renderReason();return;
+  }
+
+  if(kind==="ext"){
+    if(!reasonExteriorEnabled){
+      $("#reasonClickMsg").textContent="먼저 180(□−2)의 □에 6을 넣어 내각의 합을 확인하세요.";
       $("#reasonClickMsg").className="feedback bad";return;
     }
-    re.add(i);renderReason();straight();
-    $("#reasonClickMsg").textContent=`외각 ${re.size}/${rn}개 선택`;
-    $("#reasonClickMsg").className="feedback "+(re.size===rn?"ok":"");
+    if(re.has(i))return;
+    re.add(i);
+    $("#reasonClickMsg").textContent=`외각 ${re.size}/${rn}개 선택 · 내각 720°에 외각이 계속 더해지고 있습니다.`;
+    if(re.size===rn){
+      reasonStraightEnabled=true;
+      $("#straightCard").classList.remove("disabled-box");
+      $("#reasonClickMsg").textContent="모든 외각을 선택했습니다. 이제 깜빡이는 '한 변+연장선'을 눌러 평각을 하나씩 확인하세요.";
+      $("#reasonClickMsg").className="feedback ok";
+    }
+    renderReason();return;
+  }
+
+  if(kind==="straight"){
+    if(!reasonStraightEnabled||sd.has(i))return;
+    sd.add(i);
+    const flatSum=sd.size*180;
+    $("#straightResult").textContent=sd.size<rn
+      ? `평각으로 확인한 각의 합: ${Array(sd.size).fill("180°").join(" + ")} = ${flatSum}°`
+      : `색칠된 모든 각의 합 1080° = 180° × 6 = 1080°`;
+    $("#straightResult").classList.remove("muted");
+    if(sd.size===rn){
+      $("#deriveCard").classList.remove("disabled-box");
+      $("#reasonClickMsg").textContent="6개의 평각을 모두 확인했습니다. 아래에서 외각의 합이 360°가 되는 식을 완성해 보세요.";
+      $("#reasonClickMsg").className="feedback ok";
+    }
+    renderReason();
   }
 });
 renderReason();
-function straight(){if(ri.size<rn||re.size<rn||!reasonInteriorConfirmed)return;$("#straightCard").classList.remove("disabled-box");const b=$("#straightButtons");b.innerHTML="";for(let i=0;i<rn;i++){const x=document.createElement("button");x.textContent=String.fromCharCode(65+i)+"의 내각+외각"+(sd.has(i)?" = 180°":"");if(sd.has(i))x.classList.add("done");x.onclick=()=>{sd.add(i);straight();if(sd.size===rn){$("#straightResult").textContent="모든 꼭짓점의 평각의 합 = 180° × n";$("#straightResult").classList.remove("muted");$("#deriveCard").classList.remove("disabled-box")}};b.appendChild(x)}}renderReason();
+
 function dnd(bankSel,zonesSel,tokens){const bank=$(bankSel);tokens.forEach((t,i)=>{const b=document.createElement("button");b.className="drag-token";b.type="button";b.draggable=true;b.textContent=t[0];b.dataset.value=t[1];b.dataset.id=bankSel+i;b.ondragstart=e=>e.dataTransfer.setData("text/plain",b.dataset.id);b.onclick=()=>{$$(".drag-token.selected").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};bank.appendChild(b)});$$(zonesSel).forEach(z=>{z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();fill(z,$(`.drag-token[data-id="${e.dataTransfer.getData("text/plain")}"]`))};z.onclick=()=>fill(z,$(".drag-token.selected:not(.used)"))});function fill(z,t){if(!t)return;z.textContent=t.textContent;z.dataset.value=t.dataset.value;z.classList.add("filled");t.classList.add("used");t.classList.remove("selected")}}
 dnd("#deriveTokens","#deriveCard .drop-zone",[["내각의 합","180(n-2)"],["외각의 합","외각의합"],["180n","180n"],["180(n-2)","180(n-2)"],["360","360"],["180n","180n"]]);dnd("#regularTokens","#regularBox .drop-zone",[["같다","같다"],["같다","같다"],["n-2","n-2"],["n","n"],["360","360"],["n","n"]]);
 
