@@ -112,23 +112,140 @@
 <section class="activity card" data-activity="5"><div class="activity-head"><span class="num">5</span><div><h2>개념 적용하기 · 외각</h2><p>다각형의 외각의 크기의 합을 이용해 x를 구해 봅시다.</p></div></div><div class="lock-cover">🔒 교사가 활동 5를 열면 시작할 수 있습니다.</div>
 <div class="problem-layout"><svg id="exteriorProblemSvg" viewBox="0 0 460 340" class="problem-svg" aria-label="외각의 합 적용 문제"></svg><div><p>그림은 한 오각형의 각 꼭짓점에서 <b>한 변을 연장하여 만든 외각</b>을 나타냅니다. 외각의 크기가 90°, 60°, 70°, 30°, x°일 때 <b>x</b>를 구해 보세요.</p><div class="inline-answer"><input id="exteriorX" inputmode="decimal"><span>°</span><button data-check="exterior-x">확인</button></div><p id="exteriorXMsg" class="feedback"></p></div></div></section>
 
-<section class="activity card" data-activity="6"><div class="activity-head"><span class="num">6</span><div><h2>정다각형의 한 내각과 한 외각</h2><p>조각을 끌어 빈칸을 완성해 보세요.</p></div></div><div class="lock-cover">🔒 교사가 활동 6을 열면 시작할 수 있습니다.</div><div id="regularBox" class="regular-box"><p>정다각형은 내각의 크기가 모두 <span class="drop-zone" data-answer="같다"></span>. 따라서 정n각형의 한 내각의 크기는 180°×(<span class="drop-zone" data-answer="n-2"></span>)÷<span class="drop-zone" data-answer="n"></span> 이다.</p><p>또한 정다각형은 내각의 크기가 모두 같으므로 외각의 크기도 모두 <span class="drop-zone" data-answer="같다"></span>.</p><p>따라서 정n각형의 한 외각의 크기는 <span class="drop-zone" data-answer="360"></span>°÷<span class="drop-zone" data-answer="n"></span> 이다.</p><div id="regularTokens" class="token-bank"></div><button class="primary" data-check="regular">완성 확인</button><p id="regularMsg" class="feedback"></p>
-<div class="heptagon-apply">
-  <h3>직접 적용해 보기 · 정칠각형</h3>
-  <div class="heptagon-layout">
-    <svg id="heptagonSvg" viewBox="0 0 300 260" aria-label="정칠각형"></svg>
-    <div class="heptagon-questions">
-      <label>정칠각형의 한 내각의 크기는?</label>
-      <div class="inline-answer"><input id="heptInterior" placeholder="예: 900/7" inputmode="decimal"><span>°</span></div>
-      <label>정칠각형의 한 외각의 크기는?</label>
-      <div class="inline-answer"><input id="heptExterior" placeholder="예: 360/7" inputmode="decimal"><span>°</span></div>
-      <button type="button" class="primary" data-check="heptagon">확인</button>
-      <p id="heptagonMsg" class="feedback"></p>
+<section class="activity card" data-activity="6">
+  <div class="activity-head">
+    <span class="num">6</span>
+    <div>
+      <h2>정다각형의 한 내각과 한 외각</h2>
+      <p>정다각형의 성질을 정리한 뒤 정팔각형에 직접 적용해 봅시다.</p>
     </div>
   </div>
-</div></div></section>
+  <div class="lock-cover">🔒 교사가 활동 6을 열면 시작할 수 있습니다.</div>
 
-<section class="activity card" data-activity="7"><div class="activity-head"><span class="num">7</span><div><h2>생각 더 나아가기</h2><p>왜 한 꼭짓점에서 그을 수 있는 모든 대각선을 그어야 할까요?</p></div></div><div class="lock-cover">🔒 교사가 활동 7을 열면 시작할 수 있습니다.</div><div class="think-layout"><svg viewBox="0 0 360 320" class="problem-svg"><polygon points="180,35 300,118 255,265 105,265 60,118" fill="#fff" stroke="#222" stroke-width="3"/><line x1="180" y1="35" x2="255" y2="265" stroke="#ee866f" stroke-width="2.5"/><line x1="255" y1="265" x2="60" y2="118" stroke="#ee866f" stroke-width="2.5"/><line x1="60" y1="118" x2="300" y2="118" stroke="#ee866f" stroke-width="2.5"/><line x1="300" y1="118" x2="105" y2="265" stroke="#ee866f" stroke-width="2.5"/><line x1="105" y1="265" x2="180" y2="35" stroke="#ee866f" stroke-width="2.5"/></svg><div><div class="dialogue"><p><b>가림:</b> “오각형 안이 여러 삼각형으로 나뉘었으니 삼각형 개수에 180°를 곱하면 되지 않을까?”</p><p><b>도움:</b> “그렇게 센 삼각형의 각에는 오각형의 내각이 아닌 각도 함께 포함되어 있지 않을까?”</p></div><label><b>왜 다각형의 내각의 크기의 합을 구할 때 한 꼭짓점에서 그을 수 있는 모든 대각선을 그어야 할까요?</b></label><textarea id="reflection" rows="7"></textarea><button id="submitReflection" class="primary">답안 제출</button><p id="reflectionMsg" class="feedback"></p></div></div></section>
+  <div id="regularBox" class="regular-box">
+    <p>정다각형은 내각의 크기가 모두 <span class="drop-zone" data-answer="같다"></span>.
+      따라서 정n각형의 한 내각의 크기는
+      180°×(<span class="drop-zone" data-answer="n-2"></span>)÷<span class="drop-zone" data-answer="n"></span> 이다.</p>
+    <p>또한 정다각형은 내각의 크기가 모두 같으므로 외각의 크기도 모두
+      <span class="drop-zone" data-answer="같다"></span>.</p>
+    <p>따라서 정n각형의 한 외각의 크기는
+      <span class="drop-zone" data-answer="360"></span>°÷<span class="drop-zone" data-answer="n"></span> 이다.</p>
+    <div id="regularTokens" class="token-bank"></div>
+    <button type="button" class="primary" data-check="regular">완성 확인</button>
+    <p id="regularMsg" class="feedback"></p>
+
+    <div class="octagon-apply">
+      <h3>직접 적용해 보기 · 정팔각형</h3>
+      <div class="octagon-layout">
+        <svg id="octagonSvg" viewBox="0 0 320 280" aria-label="정팔각형"></svg>
+        <div class="octagon-questions">
+          <label>정팔각형의 한 내각의 크기는?</label>
+          <div class="inline-answer"><input id="octInterior" inputmode="decimal"><span>°</span></div>
+          <label>정팔각형의 한 외각의 크기는?</label>
+          <div class="inline-answer"><input id="octExterior" inputmode="decimal"><span>°</span></div>
+          <button type="button" class="primary" data-check="octagon">확인</button>
+          <p id="octagonMsg" class="feedback"></p>
+
+          <div class="optional-tools">
+            <button type="button" id="hintToggle" class="secondary-btn">힌트 보기</button>
+            <button type="button" id="challengeToggle" class="secondary-btn">도전</button>
+          </div>
+
+          <div id="octHint" class="optional-panel hidden-panel">
+            <h4>힌트</h4>
+            <p>정팔각형은 <b>n=8</b>인 경우입니다. 조각을 끌어 식을 완성해 보세요.</p>
+            <div class="hint-formula">
+              <span class="drop-zone oct-hint-zone" data-answer="180"></span>
+              <span>° × (</span>
+              <span class="drop-zone oct-hint-zone" data-answer="n-2"></span>
+              <span>) ÷ </span>
+              <span class="drop-zone oct-hint-zone" data-answer="n"></span>
+            </div>
+            <div id="octHintTokens" class="token-bank"></div>
+            <button type="button" class="secondary-btn" data-check="oct-hint">힌트 식 확인</button>
+            <p id="octHintMsg" class="feedback"></p>
+          </div>
+
+          <div id="octChallenge" class="optional-panel hidden-panel">
+            <h4>도전</h4>
+            <label for="challengeAnswer"><b>혹시 외각의 크기를 이용해서 내각의 크기를 구할 수 있을까요? 그 방법을 알려주세요.</b></label>
+            <textarea id="challengeAnswer" rows="5" placeholder="자신의 방법을 설명해 보세요."></textarea>
+            <button type="button" id="submitChallenge" class="primary">도전 답안 제출</button>
+            <p id="challengeMsg" class="feedback"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="activity card" data-activity="7">
+  <div class="activity-head">
+    <span class="num">7</span>
+    <div>
+      <h2>생각 더 나아가기</h2>
+      <p>세곡이의 생각에서 무엇이 잘못되었는지 두곡이의 입장에서 설명해 봅시다.</p>
+    </div>
+  </div>
+  <div class="lock-cover">🔒 교사가 활동 7을 열면 시작할 수 있습니다.</div>
+
+  <div class="think-story">
+    <div class="wrong-partition-card">
+      <div class="wrong-partition-title">세곡이가 그린 오각형</div>
+      <svg id="wrongPentagonSvg" viewBox="0 0 360 310" class="wrong-pentagon-svg" aria-label="오각형 내부의 한 점과 다섯 꼭짓점을 이어 다섯 삼각형으로 나눈 그림">
+        <polygon points="180,28 304,112 258,265 102,265 56,112" fill="#fff" stroke="#20252b" stroke-width="4"/>
+        <circle cx="180" cy="153" r="5.5" fill="#f28e4b"/>
+        <line x1="180" y1="153" x2="180" y2="28" class="wrong-divider"/>
+        <line x1="180" y1="153" x2="304" y2="112" class="wrong-divider"/>
+        <line x1="180" y1="153" x2="258" y2="265" class="wrong-divider"/>
+        <line x1="180" y1="153" x2="102" y2="265" class="wrong-divider"/>
+        <line x1="180" y1="153" x2="56" y2="112" class="wrong-divider"/>
+      </svg>
+      <p class="wrong-partition-note">※ 오각형 내부의 한 점에서 다섯 꼭짓점을 이어 다섯 개의 삼각형으로 나눈 모습</p>
+    </div>
+
+    <div class="student-chat">
+      <div class="chat-row segok">
+        <div class="student-avatar" aria-label="세곡이">
+          <svg viewBox="0 0 90 90" aria-hidden="true">
+            <circle cx="45" cy="45" r="40" fill="#d9e9f7"/>
+            <circle cx="45" cy="38" r="19" fill="#f1c9a5"/>
+            <path d="M27 36 Q28 14 45 14 Q64 15 64 38 Q55 29 39 30 Q32 31 27 36" fill="#2f3742"/>
+            <circle cx="38" cy="39" r="2" fill="#222"/><circle cx="52" cy="39" r="2" fill="#222"/>
+            <path d="M39 49 Q45 53 51 49" fill="none" stroke="#ad6d5b" stroke-width="2"/>
+            <path d="M17 84 Q20 61 45 60 Q70 61 73 84" fill="#4c78a8"/>
+          </svg>
+          <b>세곡</b>
+        </div>
+        <div class="speech-bubble">
+          오각형을 다음과 같이 다섯 개의 삼각형으로 나눌 수 있으니까 오각형의 내각의 크기의 합은
+          <b>180×5=900°</b>이어야 해.
+        </div>
+      </div>
+
+      <div class="chat-row dugok">
+        <div class="student-avatar" aria-label="두곡이">
+          <svg viewBox="0 0 90 90" aria-hidden="true">
+            <circle cx="45" cy="45" r="40" fill="#f7e4c9"/>
+            <circle cx="45" cy="38" r="19" fill="#f0c8a3"/>
+            <path d="M27 36 Q30 15 46 14 Q63 16 65 37 Q55 25 34 30 Z" fill="#5a4037"/>
+            <circle cx="38" cy="39" r="2" fill="#222"/><circle cx="52" cy="39" r="2" fill="#222"/>
+            <path d="M39 50 Q45 47 51 50" fill="none" stroke="#ad6d5b" stroke-width="2"/>
+            <path d="M17 84 Q20 61 45 60 Q70 61 73 84" fill="#8f78b8"/>
+          </svg>
+          <b>두곡</b>
+        </div>
+        <div class="speech-bubble challenge-bubble">
+          <b>무슨 소리야.</b>
+          <label for="reflection">두곡이의 입장에서 세곡이에게 왜 900°가 아닌지 설명해 주세요.</label>
+          <textarea id="reflection" rows="7" placeholder="세곡이의 방법에서 무엇을 잘못 세었는지 설명해 보세요."></textarea>
+          <button id="submitReflection" type="button" class="primary">답안 제출</button>
+          <p id="reflectionMsg" class="feedback"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 </main>
 <div id="loginModal" class="modal show"><div class="modal-card"><div class="eyebrow">2026 수학 웹활동지</div><h2>다각형의 내각, 외각의 크기의 합</h2><p>학번을 입력하고 활동을 시작하세요.</p><label>학번</label><input id="studentId" maxlength="12" placeholder="예: 10507"><button id="startBtn" class="primary full">활동 시작</button><p id="loginMsg" class="feedback"></p></div></div>
 <script type="module" src="./app.js"></script></body></html>

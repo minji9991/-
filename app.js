@@ -74,11 +74,16 @@ if(k==="reason-n"){
 if(k==="derive"){const ok=$$("#deriveCard .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("deriveMsg",ok?"외각의 합은 360°입니다.":"빈칸을 다시 확인하세요.",ok);if(ok)answer("a4_derivation",{completed:true})}
 if(k==="exterior-x"){const ok=norm($("#exteriorX").value)==="110";fb("exteriorXMsg",ok?"정답입니다. x=110°입니다.":"왼쪽 아래 외각은 90°입니다.",ok);if(ok)answer("a5_exterior_x",{value:110})}
 if(k==="regular"){const ok=$$("#regularBox .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("regularMsg",ok?"정확히 정리했습니다.":"조각을 다시 확인하세요.",ok);if(ok)answer("a6_regular",{completed:true})}
-if(k==="heptagon"){
-  const a=parseDegreeValue($("#heptInterior").value),b=parseDegreeValue($("#heptExterior").value);
-  const ok=Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-900/7)<0.03&&Math.abs(b-360/7)<0.03;
-  fb("heptagonMsg",ok?"정답입니다. 한 내각은 900/7°(약 128.57°), 한 외각은 360/7°(약 51.43°)입니다.":"정칠각형은 n=7입니다. 한 내각과 한 외각 공식을 각각 적용해 보세요.",ok);
-  if(ok)answer("a6_heptagon",{interior:"900/7",exterior:"360/7"});
+if(k==="octagon"){
+  const a=parseDegreeValue($("#octInterior").value),b=parseDegreeValue($("#octExterior").value);
+  const ok=Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-135)<0.03&&Math.abs(b-45)<0.03;
+  fb("octagonMsg",ok?"정답입니다. 정팔각형의 한 내각은 135°, 한 외각은 45°입니다.":"정팔각형은 n=8입니다. 정다각형의 한 내각과 한 외각 공식을 적용해 보세요.",ok);
+  if(ok)answer("a6_octagon",{interior:135,exterior:45});
+}
+if(k==="oct-hint"){
+  const ok=$$("#octHint .drop-zone").every(z=>z.dataset.value===z.dataset.answer);
+  fb("octHintMsg",ok?"힌트 식을 잘 완성했습니다. 이제 n=8을 대입해 보세요.":"세 조각의 위치를 다시 생각해 보세요.",ok);
+  if(ok)answer("a6_octagon_hint",{completed:true});
 }});
 function extAngles(p){const r=[];for(let i=0;i<p.length;i++){const a=p[(i-1+p.length)%p.length],b=p[i],c=p[(i+1)%p.length],u={x:b.x-a.x,y:b.y-a.y},v={x:c.x-b.x,y:c.y-b.y};let t=Math.atan2(u.x*v.y-u.y*v.x,u.x*v.x+u.y*v.y)*180/Math.PI;if(t<0)t+=360;if(t>180)t=360-t;r.push(t)}const s=r.reduce((a,b)=>a+b,0);return r.map(x=>x*360/s)}
 function wedge(cx,cy,r,a0,a1){const p0={x:cx+r*Math.cos(a0),y:cy+r*Math.sin(a0)},p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)};let d=a1-a0;while(d<0)d+=Math.PI*2;while(d>=Math.PI*2)d-=Math.PI*2;return`M ${cx} ${cy} L ${p0.x} ${p0.y} A ${r} ${r} 0 ${d>Math.PI?1:0} 1 ${p1.x} ${p1.y} Z`}
@@ -256,7 +261,7 @@ for(let i=0;i<6;i++) reasonRaw.push({
   x:reasonRaw[i].x+reasonLens[i]*Math.cos(reasonDirs[i]),
   y:reasonRaw[i].y+reasonLens[i]*Math.sin(reasonDirs[i])
 });
-const rawPts=reasonRaw.slice(0,6);
+const rawPts=[...reasonRaw.slice(1,6),reasonRaw[0]]; // A부터 실제 내각이 120,120,100,140,110,130 순서가 되도록 회전
 const rxs=rawPts.map(p=>p.x),rys=rawPts.map(p=>p.y);
 const rminX=Math.min(...rxs),rmaxX=Math.max(...rxs),rminY=Math.min(...rys),rmaxY=Math.max(...rys);
 const rscale=Math.min(340/(rmaxX-rminX),300/(rmaxY-rminY));
@@ -364,6 +369,7 @@ renderReason();
 
 function dnd(bankSel,zonesSel,tokens){const bank=$(bankSel);tokens.forEach((t,i)=>{const b=document.createElement("button");b.className="drag-token";b.type="button";b.draggable=true;b.textContent=t[0];b.dataset.value=t[1];b.dataset.id=bankSel+i;b.ondragstart=e=>e.dataTransfer.setData("text/plain",b.dataset.id);b.onclick=()=>{$$(".drag-token.selected").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};bank.appendChild(b)});$$(zonesSel).forEach(z=>{z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();fill(z,$(`.drag-token[data-id="${e.dataTransfer.getData("text/plain")}"]`))};z.onclick=()=>fill(z,$(".drag-token.selected:not(.used)"))});function fill(z,t){if(!t)return;z.textContent=t.textContent;z.dataset.value=t.dataset.value;z.classList.add("filled");t.classList.add("used");t.classList.remove("selected")}}
 dnd("#deriveTokens","#deriveCard .drop-zone",[["내각의 합","180(n-2)"],["외각의 합","외각의합"],["180n","180n"],["180(n-2)","180(n-2)"],["360","360"],["180n","180n"]]);dnd("#regularTokens","#regularBox .drop-zone",[["같다","같다"],["같다","같다"],["n-2","n-2"],["n","n"],["360","360"],["n","n"]]);
+dnd("#octHintTokens","#octHint .drop-zone",[["180","180"],["n-2","n-2"],["n","n"]]);
 
 function arcPath(cx,cy,r,a0,a1){
   let d=a1-a0;while(d<0)d+=Math.PI*2;while(d>=Math.PI*2)d-=Math.PI*2;
@@ -395,17 +401,30 @@ function renderExteriorProblem(){
   }
   svg.innerHTML=h;
 }
-function renderHeptagon(){
-  const svg=$("#heptagonSvg");if(!svg)return;const p=points(7,150,130,92,-Math.PI/2);
-  let h=`<polygon class="heptagon-poly" points="${p.map(q=>`${q.x},${q.y}`).join(" ")}"/>`;
-  const cur=p[0],prev=p[6],next=p[1],aPrev=Math.atan2(prev.y-cur.y,prev.x-cur.x),aNext=Math.atan2(next.y-cur.y,next.x-cur.x);
-  h+=`<path class="heptagon-angle" d="${smallWedge(cur.x,cur.y,34,aPrev,aNext)}"/>`;
-  const dx=cur.x-prev.x,dy=cur.y-prev.y,l=Math.hypot(dx,dy),ext={x:cur.x+dx/l*55,y:cur.y+dy/l*55},aExt=Math.atan2(ext.y-cur.y,ext.x-cur.x);
-  h+=`<line class="extension" x1="${cur.x}" y1="${cur.y}" x2="${ext.x}" y2="${ext.y}"/><path class="heptagon-ext" d="${smallWedge(cur.x,cur.y,34,aNext,aExt)}"/>`;
-  p.forEach((q,i)=>h+=`<text x="${q.x+8}" y="${q.y-8}" font-weight="900">${String.fromCharCode(65+i)}</text>`);
+function renderOctagon(){
+  const svg=$("#octagonSvg");if(!svg)return;
+  const p=points(8,160,140,96,-Math.PI/2-Math.PI/8);
+  let h=`<polygon class="octagon-poly" points="${p.map(q=>`${q.x},${q.y}`).join(" ")}"/>`;
+  const cur=p[0],prev=p[7],next=p[1];
+  const aPrev=Math.atan2(prev.y-cur.y,prev.x-cur.x),aNext=Math.atan2(next.y-cur.y,next.x-cur.x);
+  h+=`<path class="octagon-angle" d="${smallWedge(cur.x,cur.y,38,aPrev,aNext)}"/>`;
+  const dx=cur.x-prev.x,dy=cur.y-prev.y,l=Math.hypot(dx,dy),ext={x:cur.x+dx/l*58,y:cur.y+dy/l*58},aExt=Math.atan2(ext.y-cur.y,ext.x-cur.x);
+  h+=`<line class="extension" x1="${cur.x}" y1="${cur.y}" x2="${ext.x}" y2="${ext.y}"/>`;
+  h+=`<path class="octagon-ext" d="${smallWedge(cur.x,cur.y,38,aNext,aExt)}"/>`;
+  p.forEach((q,i)=>h+=`<text class="octagon-label" x="${q.x+9}" y="${q.y-8}">${String.fromCharCode(65+i)}</text>`);
   svg.innerHTML=h;
 }
-renderExteriorProblem();renderHeptagon();
+renderExteriorProblem();renderOctagon();
+
+
+$("#hintToggle").onclick=()=>$("#octHint").classList.toggle("hidden-panel");
+$("#challengeToggle").onclick=()=>$("#octChallenge").classList.toggle("hidden-panel");
+$("#submitChallenge").onclick=async()=>{
+  const t=$("#challengeAnswer").value.trim();
+  if(t.length<8){fb("challengeMsg","방법을 조금 더 구체적으로 설명해 주세요.");return}
+  await answer("a6_challenge",{text:t},true);
+  fb("challengeMsg","도전 답안이 제출되었습니다. 교사 화면에서도 확인할 수 있습니다.",true);
+};
 
 $("#submitReflection").onclick=async()=>{const t=$("#reflection").value.trim();if(t.length<10){fb("reflectionMsg","조금 더 구체적으로 적어 주세요.");return}await answer("a7_reflection",{text:t},true);await rpc("poly_student_submit",{p_session_id:state.sessionId});fb("reflectionMsg","답안이 제출되었습니다.",true);$("#saveBadge").textContent="제출 완료"};
 const obs=new IntersectionObserver(es=>{const v=es.filter(x=>x.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(v)state.currentActivity=+v.target.dataset.activity},{threshold:[.25,.5,.75]});$$(".activity").forEach(x=>obs.observe(x));
