@@ -81,7 +81,7 @@ if(k==="derive"){
   const ok=firstOk&&secondOk&&thirdOk;
   fb("deriveMsg",ok?"정리했습니다. 내각의 합과 외각의 합의 순서를 바꾸어 놓아도 같은 식입니다.":"빈칸의 식을 다시 확인해 보세요. 첫 줄의 내각의 합과 외각의 합은 서로 순서를 바꾸어도 됩니다.",ok);
   if(ok)answer("a4_derivation",{completed:true});
-})}
+}
 if(k==="exterior-x"){const ok=norm($("#exteriorX").value)==="110";fb("exteriorXMsg",ok?"정답입니다. x=110°입니다.":"왼쪽 아래 외각은 90°입니다.",ok);if(ok)answer("a5_exterior_x",{value:110})}
 if(k==="regular"){
   const z=$$("#regularBox .drop-zone");
@@ -90,7 +90,7 @@ if(k==="regular"){
   const ok=v.length===expected.length&&v.every((x,i)=>x===expected[i]);
   fb("regularMsg",ok?"정확히 정리했습니다.":"조각의 위치를 다시 확인해 보세요. 같은 글자 조각끼리는 어느 것을 사용해도 정답으로 인정됩니다.",ok);
   if(ok)answer("a6_regular",{completed:true});
-})}
+}
 if(k==="octagon"){
   const a=parseDegreeValue($("#octInterior").value),b=parseDegreeValue($("#octExterior").value);
   const ok=Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-135)<0.03&&Math.abs(b-45)<0.03;
