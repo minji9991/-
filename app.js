@@ -29,9 +29,60 @@ if(k==="derive"){const ok=$$("#deriveCard .drop-zone").every(z=>z.dataset.value=
 if(k==="exterior-x"){const ok=norm($("#exteriorX").value)==="110";fb("exteriorXMsg",ok?"정답입니다. x=110°입니다.":"왼쪽 아래 외각은 90°입니다.",ok);if(ok)answer("a5_exterior_x",{value:110})}
 if(k==="regular"){const ok=$$("#regularBox .drop-zone").every(z=>z.dataset.value===z.dataset.answer);fb("regularMsg",ok?"정확히 정리했습니다.":"조각을 다시 확인하세요.",ok);if(ok)answer("a6_regular",{completed:true})}});
 function extAngles(p){const r=[];for(let i=0;i<p.length;i++){const a=p[(i-1+p.length)%p.length],b=p[i],c=p[(i+1)%p.length],u={x:b.x-a.x,y:b.y-a.y},v={x:c.x-b.x,y:c.y-b.y};let t=Math.atan2(u.x*v.y-u.y*v.x,u.x*v.x+u.y*v.y)*180/Math.PI;if(t<0)t+=360;if(t>180)t=360-t;r.push(t)}const s=r.reduce((a,b)=>a+b,0);return r.map(x=>x*360/s)}
-function wedge(cx,cy,r,a0,a1){const p0={x:cx+r*Math.cos(a0),y:cy+r*Math.sin(a0)},p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)};return`M ${cx} ${cy} L ${p0.x} ${p0.y} A ${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${p1.x} ${p1.y} Z`}
-function experiment(root){const n=+root.dataset.n,svg=$(".exterior-svg",root),ring=$(".angle-ring svg",root);let p=points(n,210,150,n===4?92:102,-Math.PI/2-.12),extended=false,ch=new Set(),drag=null;function rr(){ring.innerHTML=`<circle cx="120" cy="120" r="84" class="ring-circle"></circle>`;const A=extAngles(p);let s=-Math.PI/2;A.forEach((d,i)=>{if(!ch.has(i))return;const e=s+d*Math.PI/180;ring.insertAdjacentHTML("beforeend",`<path d="${wedge(120,120,82,s,e)}" class="ring-sector" fill="hsl(${[160,22,205,48,330][i%5]} 58% 72%)"></path>`);s=e});if(ch.size===n){ring.insertAdjacentHTML("beforeend",`<text x="120" y="126" text-anchor="middle" font-size="28" font-weight="900">360°</text>`);state.experimentsDone.add(n);if(state.experimentsDone.has(4)&&state.experimentsDone.has(5))$("#exteriorConclusion").classList.remove("disabled-box")}}function render(){let h=`<polygon points="${p.map(q=>q.x+","+q.y).join(" ")}" fill="#fff" stroke="#222" stroke-width="3"/>`;if(extended)for(let i=0;i<n;i++){const b=p[i],c=p[(i+1)%n],dx=c.x-b.x,dy=c.y-b.y,l=Math.hypot(dx,dy),ex={x:b.x-dx/l*60,y:b.y-dy/l*60};h+=`<line x1="${b.x}" y1="${b.y}" x2="${ex.x}" y2="${ex.y}" class="extension"/>`;const a=Math.atan2(-dy,-dx);h+=`<path class="ext-wedge ${ch.has(i)?"chosen":""}" data-i="${i}" d="${wedge(b.x,b.y,33,a,a+.65)}"/>`}p.forEach((q,i)=>h+=`<circle class="drag-vertex" data-i="${i}" cx="${q.x}" cy="${q.y}" r="9"/><text x="${q.x+11}" y="${q.y-10}" font-weight="900">${String.fromCharCode(65+i)}</text>`);svg.innerHTML=h;$$(".ext-wedge",svg).forEach(x=>x.onclick=()=>{ch.add(+x.dataset.i);$(".mini-status",root).textContent=`외각 ${ch.size} / ${n} 선택`;render();rr()});$$(".drag-vertex",svg).forEach(v=>{v.onpointerdown=e=>{drag=+v.dataset.i;v.setPointerCapture(e.pointerId)};v.onpointermove=e=>{if(drag===null)return;const r=svg.getBoundingClientRect();p[drag]={x:Math.max(45,Math.min(375,(e.clientX-r.left)*420/r.width)),y:Math.max(35,Math.min(265,(e.clientY-r.top)*300/r.height))};ch.clear();$(".mini-status",root).textContent=`외각 0 / ${n} 선택`;render();rr()};v.onpointerup=()=>drag=null})}$(".extend-btn",root).onclick=()=>{extended=true;ch.clear();render();rr()};render();rr()}$$(".experiment").forEach(experiment);
-const rn=6,rp=points(rn,260,210,145,-Math.PI/2);let ri=new Set(),re=new Set(),sd=new Set();function renderReason(){let h=`<polygon class="reason-poly" points="${rp.map(p=>p.x+","+p.y).join(" ")}"/>`;rp.forEach((p,i)=>{h+=`<path data-i="${i}" class="reason-int ${ri.has(i)?"chosen":""}" d="${wedge(p.x,p.y,31,-2.7,-1.6)}"/><path data-i="${i}" class="reason-ext ${re.has(i)?"chosen":""}" d="${wedge(p.x,p.y,31,-.5,.15)}"/><text x="${p.x+12}" y="${p.y-12}" font-weight="900">${String.fromCharCode(65+i)}</text>`});$("#reasonSvg").innerHTML=h;$$(".reason-int").forEach(x=>x.onclick=()=>{ri.add(+x.dataset.i);renderReason();if(ri.size===rn)$("#interiorFormulaCard").classList.remove("disabled-box")});$$(".reason-ext").forEach(x=>x.onclick=()=>{re.add(+x.dataset.i);renderReason();straight()})}function straight(){if(ri.size<rn||re.size<rn)return;$("#straightCard").classList.remove("disabled-box");const b=$("#straightButtons");b.innerHTML="";for(let i=0;i<rn;i++){const x=document.createElement("button");x.textContent=String.fromCharCode(65+i)+"의 내각+외각"+(sd.has(i)?" = 180°":"");if(sd.has(i))x.classList.add("done");x.onclick=()=>{sd.add(i);straight();if(sd.size===rn){$("#straightResult").textContent="모든 꼭짓점의 평각의 합 = 180° × n";$("#straightResult").classList.remove("muted");$("#deriveCard").classList.remove("disabled-box")}};b.appendChild(x)}}renderReason();
+function wedge(cx,cy,r,a0,a1){const p0={x:cx+r*Math.cos(a0),y:cy+r*Math.sin(a0)},p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)};let d=a1-a0;while(d<0)d+=Math.PI*2;while(d>=Math.PI*2)d-=Math.PI*2;return`M ${cx} ${cy} L ${p0.x} ${p0.y} A ${r} ${r} 0 ${d>Math.PI?1:0} 1 ${p1.x} ${p1.y} Z`}
+function smallWedge(cx,cy,r,a,b){let d=b-a;while(d<0)d+=Math.PI*2;while(d>=Math.PI*2)d-=Math.PI*2;if(d<=Math.PI)return wedge(cx,cy,r,a,a+d);return wedge(cx,cy,r,b,b+(Math.PI*2-d))}
+function experiment(root){
+  const n=+root.dataset.n,svg=$(".exterior-svg",root),ring=$(".angle-ring svg",root);
+  let p=points(n,210,150,n===4?92:102,-Math.PI/2-.12),extended=false,ch=new Set(),drag=null;
+  function rr(){
+    ring.innerHTML=`<circle cx="120" cy="120" r="84" class="ring-circle"></circle>`;
+    const A=extAngles(p);let s=-Math.PI/2;
+    A.forEach((d,i)=>{if(!ch.has(i))return;const e=s+d*Math.PI/180;ring.insertAdjacentHTML("beforeend",`<path d="${wedge(120,120,82,s,e)}" class="ring-sector" fill="hsl(${[160,22,205,48,330][i%5]} 58% 72%)"></path>`);s=e});
+    if(ch.size===n){ring.insertAdjacentHTML("beforeend",`<text x="120" y="126" text-anchor="middle" font-size="28" font-weight="900">360°</text>`);state.experimentsDone.add(n);if(state.experimentsDone.has(4)&&state.experimentsDone.has(5))$("#exteriorConclusion").classList.remove("disabled-box")}
+  }
+  function render(){
+    let h=`<polygon points="${p.map(q=>q.x+","+q.y).join(" ")}" fill="#fff" stroke="#222" stroke-width="3"/>`;
+    if(extended) for(let i=0;i<n;i++){
+      const prev=p[(i-1+n)%n],cur=p[i],next=p[(i+1)%n];
+      // 외각은 '이전 변을 꼭짓점 너머로 연장한 반직선'과 '다음 변' 사이의 각이다.
+      const inDx=cur.x-prev.x,inDy=cur.y-prev.y,inLen=Math.hypot(inDx,inDy)||1;
+      const ext={x:cur.x+inDx/inLen*68,y:cur.y+inDy/inLen*68};
+      h+=`<line x1="${cur.x}" y1="${cur.y}" x2="${ext.x}" y2="${ext.y}" class="extension"/>`;
+      const extA=Math.atan2(ext.y-cur.y,ext.x-cur.x);
+      const outA=Math.atan2(next.y-cur.y,next.x-cur.x);
+      h+=`<path class="ext-wedge ${ch.has(i)?"chosen":""}" data-i="${i}" d="${smallWedge(cur.x,cur.y,38,outA,extA)}"/>`;
+    }
+    p.forEach((q,i)=>h+=`<circle class="drag-vertex" data-i="${i}" cx="${q.x}" cy="${q.y}" r="9"/><text x="${q.x+11}" y="${q.y-10}" font-weight="900">${String.fromCharCode(65+i)}</text>`);
+    svg.innerHTML=h;
+    $$(".ext-wedge",svg).forEach(x=>x.onclick=()=>{ch.add(+x.dataset.i);$(".mini-status",root).textContent=`외각 ${ch.size} / ${n} 선택`;render();rr()});
+    $$(".drag-vertex",svg).forEach(v=>{
+      v.onpointerdown=e=>{drag=+v.dataset.i;v.setPointerCapture(e.pointerId)};
+      v.onpointermove=e=>{if(drag===null)return;const r=svg.getBoundingClientRect();p[drag]={x:Math.max(45,Math.min(375,(e.clientX-r.left)*420/r.width)),y:Math.max(35,Math.min(265,(e.clientY-r.top)*300/r.height))};ch.clear();$(".mini-status",root).textContent=`외각 0 / ${n} 선택`;render();rr()};
+      v.onpointerup=()=>drag=null;v.onpointercancel=()=>drag=null;
+    })
+  }
+  $(".extend-btn",root).onclick=()=>{extended=true;ch.clear();render();rr();event("extension_created",{n})};
+  render();rr();
+}$$(".experiment").forEach(experiment);
+const rn=6,rp=points(rn,260,210,145,-Math.PI/2);let ri=new Set(),re=new Set(),sd=new Set();function renderReason(){
+  let h=`<polygon class="reason-poly" points="${rp.map(p=>p.x+","+p.y).join(" ")}"/>`;
+  rp.forEach((cur,i)=>{
+    const prev=rp[(i-1+rn)%rn],next=rp[(i+1)%rn];
+    const aPrev=Math.atan2(prev.y-cur.y,prev.x-cur.x),aNext=Math.atan2(next.y-cur.y,next.x-cur.x);
+    // 내각: 두 변 사이의 작은 각
+    h+=`<path data-i="${i}" class="reason-int ${ri.has(i)?"chosen":""}" d="${smallWedge(cur.x,cur.y,31,aPrev,aNext)}"/>`;
+    // 이전 변을 꼭짓점 너머로 연장
+    const dx=cur.x-prev.x,dy=cur.y-prev.y,l=Math.hypot(dx,dy)||1,ext={x:cur.x+dx/l*65,y:cur.y+dy/l*65};
+    h+=`<line x1="${cur.x}" y1="${cur.y}" x2="${ext.x}" y2="${ext.y}" class="extension"/>`;
+    const aExt=Math.atan2(ext.y-cur.y,ext.x-cur.x);
+    h+=`<path data-i="${i}" class="reason-ext ${re.has(i)?"chosen":""}" d="${smallWedge(cur.x,cur.y,31,aNext,aExt)}"/>`;
+    h+=`<text x="${cur.x+12}" y="${cur.y-12}" font-weight="900">${String.fromCharCode(65+i)}</text>`;
+  });
+  $("#reasonSvg").innerHTML=h;
+  $$(".reason-int").forEach(x=>x.onclick=()=>{ri.add(+x.dataset.i);renderReason();if(ri.size===rn)$("#interiorFormulaCard").classList.remove("disabled-box")});
+  $$(".reason-ext").forEach(x=>x.onclick=()=>{re.add(+x.dataset.i);renderReason();straight()});
+}
+function straight(){if(ri.size<rn||re.size<rn)return;$("#straightCard").classList.remove("disabled-box");const b=$("#straightButtons");b.innerHTML="";for(let i=0;i<rn;i++){const x=document.createElement("button");x.textContent=String.fromCharCode(65+i)+"의 내각+외각"+(sd.has(i)?" = 180°":"");if(sd.has(i))x.classList.add("done");x.onclick=()=>{sd.add(i);straight();if(sd.size===rn){$("#straightResult").textContent="모든 꼭짓점의 평각의 합 = 180° × n";$("#straightResult").classList.remove("muted");$("#deriveCard").classList.remove("disabled-box")}};b.appendChild(x)}}renderReason();
 function dnd(bankSel,zonesSel,tokens){const bank=$(bankSel);tokens.forEach((t,i)=>{const b=document.createElement("button");b.className="drag-token";b.type="button";b.draggable=true;b.textContent=t[0];b.dataset.value=t[1];b.dataset.id=bankSel+i;b.ondragstart=e=>e.dataTransfer.setData("text/plain",b.dataset.id);b.onclick=()=>{$$(".drag-token.selected").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};bank.appendChild(b)});$$(zonesSel).forEach(z=>{z.ondragover=e=>e.preventDefault();z.ondrop=e=>{e.preventDefault();fill(z,$(`.drag-token[data-id="${e.dataTransfer.getData("text/plain")}"]`))};z.onclick=()=>fill(z,$(".drag-token.selected:not(.used)"))});function fill(z,t){if(!t)return;z.textContent=t.textContent;z.dataset.value=t.dataset.value;z.classList.add("filled");t.classList.add("used");t.classList.remove("selected")}}
 dnd("#deriveTokens","#deriveCard .drop-zone",[["내각의 합","180(n-2)"],["외각의 합","외각의합"],["180n","180n"],["180(n-2)","180(n-2)"],["360","360"],["180n","180n"]]);dnd("#regularTokens","#regularBox .drop-zone",[["같다","같다"],["같다","같다"],["n-2","n-2"],["n","n"],["360","360"],["n","n"]]);
 $("#submitReflection").onclick=async()=>{const t=$("#reflection").value.trim();if(t.length<10){fb("reflectionMsg","조금 더 구체적으로 적어 주세요.");return}await answer("a7_reflection",{text:t},true);await rpc("poly_student_submit",{p_session_id:state.sessionId});fb("reflectionMsg","답안이 제출되었습니다.",true);$("#saveBadge").textContent="제출 완료"};
