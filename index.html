@@ -247,5 +247,29 @@
   </div>
 </section>
 </main>
-<div id="loginModal" class="modal show"><div class="modal-card"><div class="eyebrow">2026 수학 웹활동지</div><h2>다각형의 내각, 외각의 크기의 합</h2><p>학번을 입력하고 활동을 시작하세요.</p><label>학번</label><input id="studentId" maxlength="12" placeholder="예: 10507"><button id="startBtn" class="primary full">활동 시작</button><p id="loginMsg" class="feedback"></p></div></div>
+<div id="loginModal" class="modal show">
+  <div class="modal-card">
+    <div class="eyebrow">2026 수학 웹활동지</div>
+    <h2>다각형의 내각, 외각의 크기의 합</h2>
+    <p>반, 번호, 이름을 입력하고 활동을 시작하세요.</p>
+
+    <div class="student-login-grid">
+      <div>
+        <label for="classNo">반</label>
+        <input id="classNo" inputmode="numeric" maxlength="2" placeholder="예: 5">
+      </div>
+      <div>
+        <label for="studentNumber">번호</label>
+        <input id="studentNumber" inputmode="numeric" maxlength="2" placeholder="예: 7">
+      </div>
+      <div class="student-name-field">
+        <label for="studentName">이름</label>
+        <input id="studentName" maxlength="20" placeholder="예: 김민지" autocomplete="off">
+      </div>
+    </div>
+
+    <button id="startBtn" class="primary full">활동 시작</button>
+    <p id="loginMsg" class="feedback"></p>
+  </div>
+</div>
 <script type="module" src="./app.js"></script></body></html>

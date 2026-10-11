@@ -8,8 +8,35 @@ function fb(id,t,ok=false){const e=$("#"+id);e.textContent=t;e.className="feedba
 async function rpc(n,a={}){const{data,error}=await supabase.rpc(n,a);if(error)throw error;return data}
 async function event(type,payload={}){if(state.sessionId)try{await rpc("poly_student_event",{p_session_id:state.sessionId,p_event_type:type,p_payload:payload})}catch(e){}}
 async function answer(k,a,f=false){if(!state.sessionId)return;$("#saveBadge").textContent="저장 중";try{await rpc("poly_student_answer",{p_session_id:state.sessionId,p_activity_key:k,p_answer:a,p_is_final:f});$("#saveBadge").textContent="저장됨";$("#saveBadge").className="pill"}catch(e){$("#saveBadge").textContent="저장 실패";$("#saveBadge").className="pill warn";console.error(e)}}
-async function start(){const id=$("#studentId").value.trim();if(!/^[0-9A-Za-z_-]{2,12}$/.test(id)){fb("loginMsg","학번을 다시 확인해 주세요.");return}$("#startBtn").disabled=true;fb("loginMsg","접속 중...",true);try{const sid=await rpc("poly_student_start",{p_student_id:id,p_user_agent:navigator.userAgent});state.studentId=id;state.sessionId=sid;$("#studentBadge").textContent="학번 "+id;$("#studentBadge").className="pill";$("#connectionBadge").textContent="접속 중";$("#connectionBadge").className="pill";$("#loginModal").classList.remove("show");await fetchControls();beginPoll();await event("joined",{path:location.pathname})}catch(e){fb("loginMsg","접속 저장 실패: "+(e.message||e));$("#startBtn").disabled=false}}
-$("#startBtn").onclick=start;$("#studentId").addEventListener("keydown",e=>{if(e.key==="Enter")start()});
+async function start(){
+  const classNo=$("#classNo").value.trim();
+  const number=$("#studentNumber").value.trim();
+  const name=$("#studentName").value.trim();
+
+  if(!/^\d{1,2}$/.test(classNo)){fb("loginMsg","반을 숫자로 입력해 주세요.");return}
+  if(!/^\d{1,2}$/.test(number)){fb("loginMsg","번호를 숫자로 입력해 주세요.");return}
+  if(name.length<2){fb("loginMsg","이름을 입력해 주세요.");return}
+
+  const id=`CLASS|${Number(classNo)}|${Number(number)}|${name.replaceAll("|"," ")}`;
+  $("#startBtn").disabled=true;
+  fb("loginMsg","접속 중...",true);
+  try{
+    const sid=await rpc("poly_student_start",{p_student_id:id,p_user_agent:navigator.userAgent});
+    state.studentId=id;state.sessionId=sid;
+    $("#studentBadge").textContent=`${Number(classNo)}반 ${Number(number)}번 ${name}`;
+    $("#studentBadge").className="pill";
+    $("#connectionBadge").textContent="접속 중";
+    $("#connectionBadge").className="pill";
+    $("#loginModal").classList.remove("show");
+    await fetchControls();beginPoll();
+    await event("joined",{path:location.pathname,classNo:Number(classNo),number:Number(number),name});
+  }catch(e){
+    fb("loginMsg","접속 저장 실패: "+(e.message||e));
+    $("#startBtn").disabled=false;
+  }
+}
+$("#startBtn").onclick=start;
+["#classNo","#studentNumber","#studentName"].forEach(sel=>$(sel).addEventListener("keydown",e=>{if(e.key==="Enter")start()}));
 function checkIntro(kind){
   const isInterior=kind==="interior", input=$(isInterior?"#introInterior":"#introExterior"), msgId=isInterior?"introInteriorMsg":"introExteriorMsg";
   const expected=isInterior?"내각":"외각", ok=norm(input.value)===expected;
@@ -84,7 +111,7 @@ if(k==="derive"){
 }
 if(k==="exterior-x"){const ok=norm($("#exteriorX").value)==="110";fb("exteriorXMsg",ok?"정답입니다. x=110°입니다.":"왼쪽 아래 외각은 90°입니다.",ok);if(ok)answer("a5_exterior_x",{value:110})}
 if(k==="regular"){
-  const z=$$("#regularBox .drop-zone");
+  const z=$$("#regularBox > p .drop-zone");
   const v=z.map(x=>(x.dataset.value||x.textContent.trim()).replace(/\s+/g,""));
   const expected=["같다","n-2","n","같다","360","n"];
   const ok=v.length===expected.length&&v.every((x,i)=>x===expected[i]);
@@ -219,7 +246,7 @@ function experiment(root){
     e.preventDefault();e.stopPropagation();
     const ghost=document.createElement("div");ghost.className="angle-ghost";
     const A=getAngles(),a0=-Math.PI/2,a1=a0+rad(A[i]);
-    ghost.innerHTML=`<svg viewBox="0 0 90 90"><path d="${wedge(45,45,36,a0,a1)}" fill="${colors[i%colors.length]}"></path></svg>`;
+    ghost.innerHTML=`<svg viewBox="0 0 90 90"><path d="${wedge(45,45,36,a0,a1)}" style="fill:${colors[i%colors.length]};stroke:${colors[i%colors.length]};stroke-width:2"></path></svg>`;
     document.body.appendChild(ghost);
     const move=ev=>{ghost.style.left=ev.clientX+"px";ghost.style.top=ev.clientY+"px";ringWrap.classList.add("drag-target")};
     const up=ev=>{window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",up);ghost.remove();ringWrap.classList.remove("drag-target");placeFromSource(ev,i)};
@@ -230,7 +257,7 @@ function experiment(root){
     if(extended)for(let i=0;i<n;i++){
       const g=exteriorGeometry(i);
       h+=`<line x1="${g.cur.x}" y1="${g.cur.y}" x2="${g.ext.x}" y2="${g.ext.y}" class="extension"/>`;
-      h+=`<path class="ext-wedge" data-i="${i}" fill="${colors[i%colors.length]}" d="${smallWedge(g.cur.x,g.cur.y,38,g.outA,g.extA)}"/>`;
+      h+=`<path class="ext-wedge" data-i="${i}" style="fill:${colors[i%colors.length]};stroke:${colors[i%colors.length]}" d="${smallWedge(g.cur.x,g.cur.y,38,g.outA,g.extA)}"/>`;
     }
     p.forEach((q,i)=>h+=`<circle class="drag-vertex" data-i="${i}" cx="${q.x}" cy="${q.y}" r="9"/><text x="${q.x+11}" y="${q.y-10}" font-weight="900">${String.fromCharCode(65+i)}</text>`);
     svg.innerHTML=h;
@@ -443,7 +470,7 @@ function resetDnD(bankSel,zonesSel){
     t.classList.remove("used","selected");
   });
 }
-dnd("#deriveTokens","#deriveCard .drop-zone",[["내각의 합","180(n-2)"],["외각의 합","외각의합"],["180n","180n"],["180(n-2)","180(n-2)"],["360","360"],["180n","180n"]]);dnd("#regularTokens","#regularBox .drop-zone",[["같다","같다"],["같다","같다"],["n-2","n-2"],["n","n"],["360","360"],["n","n"]]);
+dnd("#deriveTokens","#deriveCard .drop-zone",[["내각의 합","180(n-2)"],["외각의 합","외각의합"],["180n","180n"],["180(n-2)","180(n-2)"],["360","360"],["180n","180n"]]);dnd("#regularTokens","#regularBox > p .drop-zone",[["같다","같다"],["같다","같다"],["n-2","n-2"],["n","n"],["360","360"],["n","n"]]);
 dnd("#octHintTokens","#octHint .drop-zone",[["180","180"],["n-2","n-2"],["n","n"]]);
 
 function arcPath(cx,cy,r,a0,a1){
@@ -498,7 +525,7 @@ $("#retryDerive").onclick=()=>{
   fb("deriveMsg","다시 조각을 놓아 보세요.",true);
 };
 $("#retryRegular").onclick=()=>{
-  resetDnD("#regularTokens","#regularBox .drop-zone");
+  resetDnD("#regularTokens","#regularBox > p .drop-zone");
   fb("regularMsg","다시 조각을 놓아 보세요.",true);
 };
 

@@ -152,3 +152,14 @@ input,select,textarea{border:1px solid #cfd8d3;border-radius:10px;padding:10px 1
   }
   .reason-v2-figure .reason-svg{max-height:calc(100vh - 245px)}
 }
+
+/* fresh8: 학생 반/번호/이름 입력 + 반별 필터 */
+.student-login-grid{display:grid;grid-template-columns:110px 110px 1fr;gap:10px;margin:12px 0 14px}
+.student-login-grid>div{min-width:0}
+.student-login-grid label{margin:0 0 6px}
+.student-login-grid input{width:100%}
+.class-filter{min-width:120px;background:#fff}
+@media(max-width:560px){
+  .student-login-grid{grid-template-columns:1fr 1fr}
+  .student-name-field{grid-column:1/-1}
+}
